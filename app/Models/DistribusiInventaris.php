@@ -28,4 +28,8 @@ class DistribusiInventaris extends Model
     {
         return $this->hasMany(DistribusiInventarisDetail::class);
     }
+    // public function details()
+    // {
+    //     return $this->hasMany(DistribusiInventarisDetail::class, 'distribusi_id');
+    // }
 }

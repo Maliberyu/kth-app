@@ -10,7 +10,7 @@ class KthController extends Controller
     public function index()
     {
         $kth = Kth::withCount(['penyadap','blok'])->paginate(10);
-        // return view('kth.index', compact('kth'));
+         return view('kth.index', compact('kth'));
     }
 
     public function create()
