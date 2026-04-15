@@ -7,6 +7,7 @@ use App\Models\BlokPeta;
 use App\Models\PenugasanBlok;
 use App\Models\Penyadap;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BlokController extends Controller
 {
@@ -26,24 +27,39 @@ class BlokController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_blok'  => 'required|string|max:100',
-            'jenis_blok' => 'nullable|string|max:50',
-            'luas'       => 'nullable|numeric|min:0',
+        $validated = $request->validate([
+            'nama_blok'               => 'required|string|max:100',
+            'jenis_blok'              => 'nullable|string|max:50',
+            'luas'                    => 'nullable|numeric|min:0',
+            'jarak_antar_pohon'       => 'nullable|numeric|min:0',
             'total_pohon'             => 'nullable|integer|min:0',
             'pohon_produktif'         => 'nullable|integer|min:0',
             'pohon_tidak_produktif'   => 'nullable|integer|min:0',
+            'geojson'                 => 'nullable|json',
         ]);
 
-        Blok::create([
-            'kth_id'                => auth()->user()->kth_id,
-            'nama_blok'             => $request->nama_blok,
-            'jenis_blok'            => $request->jenis_blok,
-            'luas'                  => $request->luas ?? 0,
-            'total_pohon'           => $request->total_pohon ?? 0,
-            'pohon_produktif'       => $request->pohon_produktif ?? 0,
-            'pohon_tidak_produktif' => $request->pohon_tidak_produktif ?? 0,
+        // 🔥 Simpan data Blok dulu
+        $blok = Blok::create([
+            'kth_id'                  => auth()->user()->kth_id,
+            'nama_blok'               => $validated['nama_blok'],
+            'jenis_blok'              => $validated['jenis_blok'] ?? null,
+            'luas'                    => $validated['luas'] ?? 0,
+            'jarak_antar_pohon'       => $validated['jarak_antar_pohon'] ?? null,
+            'total_pohon'             => $validated['total_pohon'] ?? 0,
+            'pohon_produktif'         => $validated['pohon_produktif'] ?? 0,
+            'pohon_tidak_produktif'   => $validated['pohon_tidak_produktif'] ?? 0,
         ]);
+
+        // 🔥 Jika ada geojson, simpan ke tabel blok_peta
+        if (!empty($validated['geojson'])) {
+            BlokPeta::create([
+                'blok_id'        => $blok->id,
+                'dibuat_oleh'    => auth()->id(),
+                'geojson'        => $validated['geojson'],
+                'status_mapping' => 'disetujui', // Auto approve untuk input admin
+                'catatan'        => 'Import dari form create blok',
+            ]);
+        }
 
         return redirect()->route('blok.index')->with('success', 'Blok berhasil ditambahkan.');
     }
@@ -64,26 +80,61 @@ class BlokController extends Controller
 
     public function update(Request $request, Blok $blok)
     {
-        $request->validate([
-            'nama_blok'  => 'required|string|max:100',
-            'jenis_blok' => 'nullable|string|max:50',
-            'luas'       => 'nullable|numeric|min:0',
+        $validated = $request->validate([
+            'nama_blok'               => 'required|string|max:100',
+            'jenis_blok'              => 'nullable|string|max:50',
+            'luas'                    => 'nullable|numeric|min:0',
+            'jarak_antar_pohon'       => 'nullable|numeric|min:0',
             'total_pohon'             => 'nullable|integer|min:0',
             'pohon_produktif'         => 'nullable|integer|min:0',
             'pohon_tidak_produktif'   => 'nullable|integer|min:0',
+            'geojson'                 => 'nullable|json',
         ]);
 
-        $blok->update($request->only(
-            'nama_blok','jenis_blok','luas',
-            'total_pohon','pohon_produktif','pohon_tidak_produktif'
-        ));
+        // 🔥 Update data Blok
+        $blok->update([
+            'nama_blok'               => $validated['nama_blok'],
+            'jenis_blok'              => $validated['jenis_blok'] ?? null,
+            'luas'                    => $validated['luas'] ?? 0,
+            'jarak_antar_pohon'       => $validated['jarak_antar_pohon'] ?? null,
+            'total_pohon'             => $validated['total_pohon'] ?? 0,
+            'pohon_produktif'         => $validated['pohon_produktif'] ?? 0,
+            'pohon_tidak_produktif'   => $validated['pohon_tidak_produktif'] ?? 0,
+        ]);
+
+        // 🔥 Jika ada geojson baru, simpan/update ke blok_peta
+        if (!empty($validated['geojson'])) {
+            // Cek apakah sudah ada record peta untuk blok ini
+            $blokPeta = BlokPeta::where('blok_id', $blok->id)->first();
+            
+            if ($blokPeta) {
+                // Update existing
+                $blokPeta->update([
+                    'geojson'        => $validated['geojson'],
+                    'status_mapping' => 'disetujui',
+                    'catatan'        => 'Update dari form edit blok - ' . now()->format('d/m/Y H:i'),
+                ]);
+            } else {
+                // Create new
+                BlokPeta::create([
+                    'blok_id'        => $blok->id,
+                    'dibuat_oleh'    => auth()->id(),
+                    'geojson'        => $validated['geojson'],
+                    'status_mapping' => 'disetujui',
+                    'catatan'        => 'Import dari form edit blok',
+                ]);
+            }
+        }
 
         return redirect()->route('blok.index')->with('success', 'Blok berhasil diupdate.');
     }
 
     public function destroy(Blok $blok)
     {
+        // 🔥 Hapus juga record di blok_peta jika ada (opsional, biar rapi)
+        $blok->blokPeta()->delete();
         $blok->delete();
+        
         return redirect()->route('blok.index')->with('success', 'Blok berhasil dihapus.');
     }
 
@@ -111,7 +162,7 @@ class BlokController extends Controller
         return back()->with('success', 'Penugasan berhasil dihapus.');
     }
 
-    // Simpan peta GeoJSON dari penyadap
+    // Simpan peta GeoJSON dari penyadap (tetap dipertahankan untuk flow penyadap)
     public function simpanPeta(Request $request, Blok $blok)
     {
         $request->validate([
@@ -122,7 +173,7 @@ class BlokController extends Controller
             'blok_id'        => $blok->id,
             'dibuat_oleh'    => auth()->id(),
             'geojson'        => $request->geojson,
-            'status_mapping' => 'pending',
+            'status_mapping' => 'pending', // Penyadap tetap pending, admin yang approve
         ]);
 
         return back()->with('success', 'Peta berhasil disimpan, menunggu validasi.');
