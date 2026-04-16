@@ -178,6 +178,7 @@ class BlokController extends Controller
 
         return back()->with('success', 'Peta berhasil disimpan, menunggu validasi.');
     }
+    
 
     public function validasiPeta(Request $request, BlokPeta $blokPeta)
     {
@@ -195,15 +196,48 @@ class BlokController extends Controller
     }
 
     // View untuk penyadap
+    // public function indexPenyadap()
+    // {
+    //     $penyadapId = auth()->user()->penyadap_id;
+    //     $blok = Blok::whereHas('penyadap', fn($q) => $q->where('penyadap.id', $penyadapId))
+    //                 ->with(['blokPeta' => fn($q) => $q->latest()])
+    //                 ->get();
+    //     return view('blok.penyadap_index', compact('blok'));
+    // }
+
+    // public function showPenyadap(Blok $blok)
+    // {
+    //     $blok->load(['blokPeta' => fn($q) => $q->latest()]);
+    //     return view('blok.penyadap_show', compact('blok'));
+    // }
+    // ... method simpanPeta dan validasiPeta ...
+
+    // ==========================================
+    // 🔥 VIEW UNTUK PENYADAP (PASTIKAN AKTIF)
+    // ==========================================
+    
     public function indexPenyadap()
     {
         $penyadapId = auth()->user()->penyadap_id;
+        
         $blok = Blok::whereHas('penyadap', fn($q) => $q->where('penyadap.id', $penyadapId))
                     ->with(['blokPeta' => fn($q) => $q->latest()])
                     ->get();
-        return view('blok.penyadap_index', compact('blok'));
+        
+        // 🔥 Siapkan data untuk mini map (JS-friendly)
+        $blokData = $blok->map(function($b) {
+            $peta = $b->blokPeta->first();
+            return [
+                'id' => $b->id,
+                'geojson' => $peta?->geojson,
+                'center' => [-7.324426, 108.0145812],
+            ];
+        });
+
+        return view('blok.penyadap_index', compact('blok', 'blokData'));
     }
 
+    // ✅ METHOD INI HARUS AKTIF (jangan dicomment!)
     public function showPenyadap(Blok $blok)
     {
         $blok->load(['blokPeta' => fn($q) => $q->latest()]);

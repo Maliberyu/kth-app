@@ -10,6 +10,8 @@ use App\Http\Controllers\SuratJalanController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\InventarisController;
 use App\Http\Controllers\BpjsController;
+ use App\Http\Controllers\PeriodeController;
+ use App\Http\Controllers\BlokPetaController;
 
 // =========================================================
 // PUBLIC
@@ -80,27 +82,35 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('bpjs/{bpjs}', [BpjsController::class, 'destroy'])->name('bpjs.destroy');
     });
 
-    // =====================================================
-    // PENYADAP
-    // =====================================================
-    // 🔴 UBAH: Hapus 'role:penyadap', cek role di dalam controller terkait
-    Route::middleware([/* 'role:penyadap' */])->prefix('saya')->name('saya.')->group(function () {
+        // =====================================================
+        // PENYADAP
+        // =====================================================
+        Route::middleware(['auth'])->prefix('saya')->name('saya.')->group(function () {
 
-        // Mapping blok sendiri
-        Route::get ('blok',        [BlokController::class, 'indexPenyadap'])->name('blok');
-        Route::get ('blok/{blok}', [BlokController::class, 'showPenyadap'])->name('blok.show');
-        Route::post('blok/{blok}/peta', [BlokController::class, 'simpanPeta'])->name('blok.peta.store');
+            // Mapping blok sendiri
+            Route::get('blok', [BlokController::class, 'indexPenyadap'])->name('blok');
+            Route::get('blok/{blok}', [BlokController::class, 'showPenyadap'])->name('blok.show');
+            
+            // ✅ SATU SAJA route untuk submit peta:
+            Route::post('blok/{blok}/peta', [BlokController::class, 'simpanPeta'])
+                ->name('blok.peta.store');  // → Full name: saya.blok.peta.store
 
-        // Produksi sendiri
-        Route::get ('produksi',        [ProduksiGetahController::class, 'indexPenyadap'])->name('produksi');
-        Route::get ('produksi/create', [ProduksiGetahController::class, 'createPenyadap'])->name('produksi.create');
-        Route::post('produksi',        [ProduksiGetahController::class, 'storePenyadap'])->name('produksi.store');
-    });
+            // Produksi sendiri
+            Route::get('produksi', [ProduksiGetahController::class, 'indexPenyadap'])->name('produksi');
+            Route::get('produksi/create', [ProduksiGetahController::class, 'createPenyadap'])->name('produksi.create');
+            Route::post('produksi', [ProduksiGetahController::class, 'storePenyadap'])->name('produksi.store');
+        });
 
     Route::get('/cek-session', function () {
         session(['test' => 'OK']);
         return session('test');
     });
+   
+
+    // Tambah di dalam group admin_kth
+    Route::get('periode', [PeriodeController::class, 'index'])->name('periode.index');
+    Route::post('periode', [PeriodeController::class, 'store'])->name('periode.store');
+    Route::delete('periode/{periode}', [PeriodeController::class, 'destroy'])->name('periode.destroy');
 
     // Route::get('/cek-auth', function () {
     //     return auth()->check() ? 'LOGIN' : 'GUEST';

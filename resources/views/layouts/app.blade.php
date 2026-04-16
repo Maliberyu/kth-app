@@ -255,10 +255,16 @@
         <div class="nav-label">Pengiriman</div>
         <a href="{{ route('surat-jalan.index') }}" class="nav-item {{ request()->routeIs('surat-jalan.*') ? 'active' : '' }}">
             <i class="fas fa-truck"></i> Surat Jalan
+        <a href="{{ route('periode.index') }}" class="nav-item {{ request()->routeIs('periode.*') ? 'active' : '' }}">
+            <i class="fas fa-calendar"></i> Master Periode
+        </a>
+        
         </a>
         <a href="{{ route('penjualan.index') }}" class="nav-item {{ request()->routeIs('penjualan.*') ? 'active' : '' }}">
             <i class="fas fa-money-bill-wave"></i> Penjualan
         </a>
+
+        
 
         <div class="nav-label">Inventaris</div>
         <a href="{{ route('inventaris.index') }}" class="nav-item {{ request()->routeIs('inventaris.*') ? 'active' : '' }}">
