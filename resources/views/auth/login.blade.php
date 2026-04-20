@@ -161,7 +161,7 @@
     <div class="brand">
         <div class="brand-logo">
             <div class="brand-icon">🌿</div>
-            <div class="brand-name">KTH <span>App</span></div>
+            <div class="brand-name">KTH <span>Management System</span></div>
         </div>
         <div class="brand-tagline">Sistem Manajemen Kelompok Tani Hutan</div>
     </div>
@@ -194,7 +194,7 @@
 <div class="right-panel">
     <div class="login-box">
         <h3>Selamat Datang</h3>
-        <p>Masuk ke akun KTH App Anda</p>
+        <p>Masuk ke akun KTH Management System Anda</p>
 
         @if($errors->any())
             <div class="error-alert">
@@ -248,7 +248,8 @@
                     Ingat saya
                 </label>
                 @if(Route::has('password.request'))
-                    <a href="{{ route('password.request') }}">Lupa password?</a>
+                    <a href="#">Lupa password?</a>
+                    <!-- <a href="{{ route('password.request') }}">Lupa password?</a> -->
                 @endif
             </div>
 
