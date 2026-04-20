@@ -44,7 +44,7 @@
                         @endphp
                         <span class="badge {{ $badge }}">{{ ucfirst($sj->status) }}</span>
                     </td>
-                    <td>
+                    <!-- <td>
                         <div style="display:flex;gap:6px;flex-wrap:wrap;">
                             <a href="{{ route('surat-jalan.show', $sj) }}" class="btn btn-outline btn-sm btn-icon" title="Detail">
                                 <i class="fas fa-eye"></i>
@@ -67,7 +67,58 @@
                             </form>
                             @endif
                         </div>
-                    </td>
+                    </td> -->
+                    <td>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        
+        {{-- 👁️ Detail (Selalu Aktif) --}}
+        <a href="{{ route('surat-jalan.show', $sj) }}" class="btn btn-outline btn-sm btn-icon" title="Detail">
+            <i class="fas fa-eye"></i>
+        </a>
+        
+        {{-- ✉️ Kirim (Hanya Draft) --}}
+        @if($sj->status === 'draft')
+        <form method="POST" action="{{ route('surat-jalan.kirim', $sj) }}">
+            @csrf @method('PATCH')
+            <button type="submit" class="btn btn-primary btn-sm" title="Kirim ke Vendor">
+                <i class="fas fa-paper-plane"></i> Kirim
+            </button>
+        </form>
+        @endif
+        
+        {{-- ✅ Selesai (Hanya Dikirim) --}}
+        @if($sj->status === 'dikirim')
+        <form method="POST" action="{{ route('surat-jalan.selesai', $sj) }}"
+              onsubmit="return confirm('Tandai selesai? Stok akan dikurangi.')">
+            @csrf @method('PATCH')
+            <button type="submit" class="btn btn-success btn-sm" title="Konfirmasi Penerimaan">
+                <i class="fas fa-check"></i> Selesai
+            </button>
+        </form>
+        @endif
+        
+        {{-- 🖨️ CETAK PDF (Kondisional) --}}
+        @if($sj->status === 'selesai')
+            {{-- ✅ HIJAU + AKTIF --}}
+            <a href="{{ route('surat-jalan.cetak-pdf', $sj) }}" 
+               class="btn btn-success btn-sm" 
+               title="Cetak Surat Jalan"
+               target="_blank">
+                <i class="fas fa-file-pdf"></i> Cetak PDF
+            </a>
+        @else
+            {{-- ❌ MERAH + DISABLED --}}
+            <button type="button" 
+                    class="btn btn-danger btn-sm" 
+                    title="Cetak hanya tersedia setelah status 'Selesai'"
+                    disabled
+                    style="cursor: not-allowed; opacity: 0.7;">
+                <i class="fas fa-file-pdf"></i> Cetak PDF
+            </button>
+        @endif
+        
+    </div>
+</td>
                 </tr>
                 @empty
                 <tr>

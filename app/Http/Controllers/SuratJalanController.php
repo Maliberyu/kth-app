@@ -85,4 +85,31 @@ class SuratJalanController extends Controller
         $suratJalan->delete();
         return redirect()->route('surat-jalan.index')->with('success', 'Surat jalan dihapus.');
     }
+
+    // 🔥 Method untuk cetak PDF Surat Jalan
+        public function cetakPdf(SuratJalan $suratJalan)
+        {
+            // Security: Pastikan hanya admin KTH yang bisa cetak
+            if (auth()->user()->role !== 'admin_kth') {
+                abort(403, 'Anda tidak berhak mencetak surat jalan ini.');
+            }
+            
+            // Load relasi yang dibutuhkan untuk PDF
+            $suratJalan->load(['vendor', 'penyimpanan', 'details.produksiGetah.penyadap', 'details.produksiGetah.blok']);
+            
+            // Opsi 1: Pakai view Blade → HTML → PDF (pakai dompdf/snappy)
+            // Opsi 2: Langsung return view untuk print browser (lebih simpel)
+            
+            // ✅ Opsi Simpel: Return view print-friendly, user print via browser (Ctrl+P → Save as PDF)
+            return view('surat_jalan.cetak', compact('suratJalan'))
+                ->with('printMode', true);
+            
+            // 🔄 Kalau mau generate PDF file beneran (pakai dompdf):
+            /*
+            use Barryvdh\DomPDF\Facade\Pdf;
+            
+            $pdf = Pdf::loadView('surat_jalan.cetak', compact('suratJalan'));
+            return $pdf->stream('Surat-Jalan-'.$suratJalan->nomor.'.pdf');
+            */
+        }
 }

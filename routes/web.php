@@ -44,7 +44,15 @@ Route::middleware(['auth'])->group(function () {
     // =====================================================
     // 🔴 UBAH: Hapus 'role:admin_kth', cek role di dalam masing-masing controller
     Route::middleware([/* 'role:admin_kth' */])->group(function () {
-
+        // Surat Jalan
+            Route::resource('surat-jalan', SuratJalanController::class);
+            Route::patch('surat-jalan/{suratJalan}/kirim', [SuratJalanController::class, 'kirim'])->name('surat-jalan.kirim');
+            Route::patch('surat-jalan/{suratJalan}/selesai', [SuratJalanController::class, 'selesai'])->name('surat-jalan.selesai');
+            
+            // 🔥 TAMBAH INI (DI DALAM GROUP YANG SAMA):
+            Route::get('surat-jalan/{suratJalan}/cetak-pdf', [SuratJalanController::class, 'cetakPdf'])
+              ->name('surat-jalan.cetak-pdf');
+    
         // Penyadap
         Route::resource('penyadap', PenyadapController::class);
 
