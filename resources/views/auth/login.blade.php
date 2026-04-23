@@ -9,6 +9,7 @@
     @vite(['resources/css/app.css'])
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
@@ -16,7 +17,7 @@
             background: #0b1f12;
         }
 
-        /* LEFT PANEL */
+        /* ─── LEFT PANEL ─────────────────────────────── */
         .left-panel {
             width: 55%;
             background: linear-gradient(145deg, #0f2419 0%, #1a4a28 60%, #0f2419 100%);
@@ -55,7 +56,7 @@
         .brand-icon {
             width: 48px; height: 48px; background: #1a7f4b;
             border-radius: 12px; display: flex; align-items: center;
-            justify-content: center; font-size: 22px;
+            justify-content: center; font-size: 22px; flex-shrink: 0;
         }
         .brand-name { color: #fff; font-size: 28px; font-weight: 800; letter-spacing: -.5px; }
         .brand-name span { color: #f0a500; }
@@ -77,7 +78,7 @@
         }
         .feature-item span { color: rgba(255,255,255,.6); font-size: 13.5px; }
 
-        /* RIGHT PANEL */
+        /* ─── RIGHT PANEL ────────────────────────────── */
         .right-panel {
             flex: 1;
             background: #fff;
@@ -145,9 +146,116 @@
             display: flex; align-items: center; gap: 8px;
         }
 
-        @media (max-width: 768px) {
+        /* ─── MOBILE HEADER BRAND (hidden on desktop) ── */
+        .mobile-header {
+            display: none;
+        }
+
+        /* ─── RESPONSIVE ─────────────────────────────── */
+
+        /* Tablet: panel kiri mengecil */
+        @media (max-width: 900px) {
+            .left-panel { width: 45%; padding: 40px 32px; }
+            .hero-text h2 { font-size: 28px; }
+            .brand-name { font-size: 22px; }
+            .right-panel { padding: 40px 32px; }
+        }
+
+        /* Mobile: layout berubah jadi satu kolom penuh */
+        @media (max-width: 640px) {
+            body { flex-direction: column; background: #fff; }
+
+            /* Sembunyikan panel kiri sepenuhnya */
             .left-panel { display: none; }
-            .right-panel { padding: 32px 24px; }
+
+            /* Right panel jadi full */
+            .right-panel {
+                flex: 1;
+                padding: 0;
+                align-items: flex-start;
+                background: #fff;
+            }
+
+            .login-box {
+                max-width: 100%;
+                width: 100%;
+                padding: 0;
+            }
+
+            /* Wrapper baru untuk mobile */
+            .mobile-wrapper {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                min-height: 100vh;
+            }
+
+            /* Header hijau kecil di atas untuk mobile */
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                background: linear-gradient(135deg, #0f2419 0%, #1a4a28 100%);
+                padding: 20px 24px;
+                position: relative;
+                overflow: hidden;
+            }
+            .mobile-header::after {
+                content: '';
+                position: absolute;
+                right: -30px; top: -30px;
+                width: 120px; height: 120px;
+                border-radius: 50%;
+                background: rgba(26,127,75,.3);
+            }
+            .mobile-header .brand-icon {
+                width: 40px; height: 40px;
+                background: #1a7f4b;
+                border-radius: 10px;
+                display: flex; align-items: center;
+                justify-content: center;
+                font-size: 18px; flex-shrink: 0;
+                position: relative; z-index: 1;
+            }
+            .mobile-header .header-text { position: relative; z-index: 1; }
+            .mobile-header .header-text strong {
+                display: block;
+                color: #fff; font-size: 15px; font-weight: 800;
+                letter-spacing: -.2px;
+            }
+            .mobile-header .header-text strong span { color: #f0a500; }
+            .mobile-header .header-text small {
+                color: rgba(255,255,255,.5); font-size: 11px;
+            }
+
+            /* Form area */
+            .form-area {
+                flex: 1;
+                padding: 32px 24px 40px;
+            }
+
+            .login-box h3 { font-size: 22px; }
+            .login-box p { margin-bottom: 24px; }
+
+            .form-control {
+                padding: 13px 14px 13px 42px;
+                font-size: 16px; /* mencegah zoom di iOS */
+            }
+
+            .btn-login {
+                padding: 15px;
+                font-size: 16px;
+            }
+
+            .remember-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+        }
+
+        /* Sangat kecil */
+        @media (max-width: 360px) {
+            .form-area { padding: 24px 16px 32px; }
         }
     </style>
 </head>
@@ -157,7 +265,6 @@
     <div class="circles">
         <span></span><span></span><span></span>
     </div>
-
     <div class="brand">
         <div class="brand-logo">
             <div class="brand-icon">🌿</div>
@@ -165,12 +272,10 @@
         </div>
         <div class="brand-tagline">Sistem Manajemen Kelompok Tani Hutan</div>
     </div>
-
     <div class="hero-text">
         <h2>Kelola <em>Produksi</em><br>Getah dengan<br>Mudah & Efisien</h2>
         <p>Platform terintegrasi untuk manajemen penyadap, produksi getah, pengiriman, dan penjualan KTH Anda.</p>
     </div>
-
     <div class="features">
         <div class="feature-item">
             <div class="feature-dot"></div>
@@ -192,72 +297,90 @@
 </div>
 
 <div class="right-panel">
-    <div class="login-box">
-        <h3>Selamat Datang</h3>
-        <p>Masuk ke akun KTH Management System Anda</p>
+    {{-- Wrapper khusus mobile --}}
+    <div class="mobile-wrapper">
 
-        @if($errors->any())
-            <div class="error-alert">
-                <span>⚠</span> {{ $errors->first() }}
+        {{-- Header brand untuk mobile --}}
+        <div class="mobile-header">
+            <div class="brand-icon">🌿</div>
+            <div class="header-text">
+                <strong>KTH <span>Management System</span></strong>
+                <small>Sistem Manajemen Kelompok Tani Hutan</small>
             </div>
-        @endif
+        </div>
 
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
+        {{-- Form area --}}
+        <div class="form-area">
+            <div class="login-box">
+                <h3>Selamat Datang</h3>
+                <p>Masuk ke akun KTH Management System Anda</p>
 
-            <div class="form-group">
-                <label class="form-label" for="email">Email</label>
-                <div class="input-wrap">
-                    <i class="fas fa-envelope"></i>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value="{{ old('email') }}"
-                        class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
-                        placeholder="contoh@email.com"
-                        required autofocus
-                    >
-                </div>
-                @error('email')
-                    <div class="error-msg">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="password">Password</label>
-                <div class="input-wrap">
-                    <i class="fas fa-lock"></i>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
-                        placeholder="••••••••"
-                        required
-                    >
-                </div>
-                @error('password')
-                    <div class="error-msg">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="remember-row">
-                <label>
-                    <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
-                    Ingat saya
-                </label>
-                @if(Route::has('password.request'))
-                    <a href="#">Lupa password?</a>
-                    <!-- <a href="{{ route('password.request') }}">Lupa password?</a> -->
+                @if($errors->any())
+                    <div class="error-alert">
+                        <span>⚠</span> {{ $errors->first() }}
+                    </div>
                 @endif
-            </div>
 
-            <button type="submit" class="btn-login">
-                Masuk ke Aplikasi
-            </button>
-        </form>
-    </div>
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-envelope"></i>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value="{{ old('email') }}"
+                                class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                                placeholder="contoh@email.com"
+                                required autofocus
+                                autocomplete="email"
+                            >
+                        </div>
+                        @error('email')
+                            <div class="error-msg">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-lock"></i>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
+                                placeholder="••••••••"
+                                required
+                                autocomplete="current-password"
+                            >
+                        </div>
+                        @error('password')
+                            <div class="error-msg">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="remember-row">
+                        <label>
+                            <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                            Ingat saya
+                        </label>
+                        @if(Route::has('password.request'))
+                            <a href="#">Lupa password?</a>
+                        @endif
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                        Masuk ke Aplikasi
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>{{-- .mobile-wrapper --}}
 </div>
 
 </body>

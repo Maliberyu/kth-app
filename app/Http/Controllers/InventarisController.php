@@ -145,24 +145,79 @@ class InventarisController extends Controller
         return view('inventaris.distribusi.index', compact('distribusi'));
     }
 
+    // public function distribusiCreate()
+    // {
+    //     $kthId    = auth()->user()->kth_id;
+    //     $penyadap = Penyadap::where('kth_id', $kthId)->orderBy('nama')->get();
+    //     $barang   = Inventaris::where('kth_id', $kthId)
+    //                     ->with('stok')
+    //                     ->orderBy('nama_barang')
+    //                     ->get();
+
+    //     if ($penyadap->isEmpty()) {
+    //         return back()->with('error', 'Belum ada penyadap terdaftar.');
+    //     }
+    //     if ($barang->isEmpty()) {
+    //         return back()->with('error', 'Belum ada data barang inventaris.');
+    //     }
+
+    //     return view('inventaris.distribusi.create', compact('penyadap', 'barang'));
+    // }
+    // public function distribusiCreate()
+    //     {
+    //         $kthId    = auth()->user()->kth_id;
+    //         $penyadap = Penyadap::where('kth_id', $kthId)->orderBy('nama')->get();
+    //         $barang   = Inventaris::where('kth_id', $kthId)
+    //                         ->with('stok')
+    //                         ->orderBy('nama_barang')
+    //                         ->get();
+
+    //         if ($penyadap->isEmpty()) {
+    //             return back()->with('error', 'Belum ada penyadap terdaftar.');
+    //         }
+    //         if ($barang->isEmpty()) {
+    //             return back()->with('error', 'Belum ada data barang inventaris.');
+    //         }
+
+    //         // ✅ Mapping di controller, hindari fn() di Blade
+    //         $barangJson = $barang->map(function ($b) {
+    //             return [
+    //                 'id'     => $b->id,
+    //                 'nama'   => $b->nama_barang,
+    //                 'stok'   => optional($b->stok)->total_stok ?? 0,
+    //                 'satuan' => $b->satuan ?? '',
+    //             ];
+    //         });
+
+    //         return view('inventaris.distribusi.create', compact('penyadap', 'barang', 'barangJson'));
+    //     }
     public function distribusiCreate()
-    {
-        $kthId    = auth()->user()->kth_id;
-        $penyadap = Penyadap::where('kth_id', $kthId)->orderBy('nama')->get();
-        $barang   = Inventaris::where('kth_id', $kthId)
-                        ->with('stok')
-                        ->orderBy('nama_barang')
-                        ->get();
+        {
+            $kthId    = auth()->user()->kth_id;
+            $penyadap = Penyadap::where('kth_id', $kthId)->orderBy('nama')->get();
+            $barang   = Inventaris::where('kth_id', $kthId)
+                            ->with('stok')
+                            ->orderBy('nama_barang')
+                            ->get();
 
-        if ($penyadap->isEmpty()) {
-            return back()->with('error', 'Belum ada penyadap terdaftar.');
-        }
-        if ($barang->isEmpty()) {
-            return back()->with('error', 'Belum ada data barang inventaris.');
-        }
+            if ($penyadap->isEmpty()) {
+                return back()->with('error', 'Belum ada penyadap terdaftar.');
+            }
+            if ($barang->isEmpty()) {
+                return back()->with('error', 'Belum ada data barang inventaris.');
+            }
 
-        return view('inventaris.distribusi.create', compact('penyadap', 'barang'));
-    }
+            $barangJson = $barang->map(function ($b) {
+                return [
+                    'id'     => $b->id,
+                    'nama'   => $b->nama_barang,
+                    'stok'   => optional($b->stok)->total_stok ?? 0,
+                    'satuan' => $b->satuan ?? '',
+                ];
+            });
+
+            return view('inventaris.distribusi.create', compact('penyadap', 'barang', 'barangJson'));
+        }
 
     public function distribusiStore(Request $request)
     {

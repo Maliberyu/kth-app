@@ -111,12 +111,7 @@
 @push('scripts')
 <script>
 let idx = 1;
-const barangList = @json($barang->map(fn($b) => [
-    'id'   => $b->id,
-    'nama' => $b->nama_barang,
-    'stok' => $b->stok?->total_stok ?? 0,
-    'satuan' => $b->satuan ?? '',
-]));
+const barangList = @json($barangJson);
 
 function tambahRow() {
     const opts = barangList.map(b =>

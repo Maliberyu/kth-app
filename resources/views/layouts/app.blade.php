@@ -20,23 +20,31 @@
         }
         body { background: #f4f6f8; color: #1e2a35; }
 
-        /* SIDEBAR */
+        /* ─── SIDEBAR ───────────────────────────────── */
         .sidebar {
             position: fixed; top: 0; left: 0;
             width: var(--sidebar-w); height: 100vh;
             background: #0f2419;
             display: flex; flex-direction: column;
-            z-index: 100; transition: transform .3s;
+            z-index: 200; transition: transform .3s ease;
         }
         .sidebar-logo {
             padding: 24px 20px 16px;
             border-bottom: 1px solid rgba(255,255,255,.08);
+            display: flex; align-items: center; justify-content: space-between;
         }
-        .sidebar-logo h1 {
-            color: #fff; font-size: 18px; font-weight: 700; margin: 0;
-        }
+        .sidebar-logo h1 { color: #fff; font-size: 18px; font-weight: 700; margin: 0; }
         .sidebar-logo span { color: var(--accent); }
         .sidebar-logo p { color: rgba(255,255,255,.4); font-size: 11px; margin: 2px 0 0; }
+
+        /* tombol close — hanya muncul di mobile */
+        .sidebar-close {
+            display: none;
+            background: none; border: none;
+            color: rgba(255,255,255,.5); font-size: 18px;
+            cursor: pointer; padding: 4px; line-height: 1;
+        }
+
         .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
         .nav-label {
             color: rgba(255,255,255,.3); font-size: 10px; font-weight: 600;
@@ -55,6 +63,7 @@
             color: #fff; border-left-color: var(--accent);
         }
         .nav-item i { width: 18px; text-align: center; font-size: 14px; }
+
         .sidebar-footer {
             padding: 16px 20px;
             border-top: 1px solid rgba(255,255,255,.08);
@@ -75,19 +84,42 @@
         }
         .logout-btn:hover { color: #ff6b6b; }
 
-        /* MAIN */
+        /* ─── OVERLAY (mobile) ──────────────────────── */
+        .sidebar-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.5);
+            z-index: 150;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.show { display: block; }
+
+        /* ─── MAIN ──────────────────────────────────── */
         .main-wrap { margin-left: var(--sidebar-w); min-height: 100vh; }
+
         .topbar {
             background: #fff; border-bottom: 1px solid #e8ecf0;
             padding: 0 28px; height: 60px;
             display: flex; align-items: center; justify-content: space-between;
-            position: sticky; top: 0; z-index: 50;
+            position: sticky; top: 0; z-index: 100;
         }
+        .topbar-left { display: flex; align-items: center; gap: 14px; }
+
+        /* tombol hamburger — hanya muncul di mobile */
+        .btn-hamburger {
+            display: none;
+            background: none; border: none;
+            font-size: 18px; color: #374151;
+            cursor: pointer; padding: 4px;
+            border-radius: 6px; line-height: 1;
+        }
+        .btn-hamburger:hover { background: #f0f3f6; }
+
         .topbar-title { font-size: 16px; font-weight: 600; color: #1e2a35; }
         .topbar-right { display: flex; align-items: center; gap: 12px; }
         .page-content { padding: 28px; }
 
-        /* CARDS */
+        /* ─── CARDS ─────────────────────────────────── */
         .card {
             background: #fff; border-radius: 12px;
             border: 1px solid #e8ecf0; overflow: hidden;
@@ -99,7 +131,7 @@
         .card-header h3 { font-size: 14px; font-weight: 600; margin: 0; }
         .card-body { padding: 20px; }
 
-        /* STAT CARDS */
+        /* ─── STAT CARDS ─────────────────────────────── */
         .stat-card {
             background: #fff; border-radius: 12px;
             border: 1px solid #e8ecf0; padding: 20px;
@@ -116,7 +148,7 @@
         .icon-blue  { background: #e8f0fe; color: #1a73e8; }
         .icon-red   { background: #fce8e6; color: #d93025; }
 
-        /* TABLE */
+        /* ─── TABLE ─────────────────────────────────── */
         .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
         thead th {
@@ -129,7 +161,7 @@
         tbody tr:hover { background: #fafbfc; }
         tbody tr:last-child td { border-bottom: none; }
 
-        /* BADGES */
+        /* ─── BADGES ─────────────────────────────────── */
         .badge {
             display: inline-flex; align-items: center;
             padding: 3px 10px; border-radius: 20px;
@@ -141,7 +173,7 @@
         .badge-info    { background: #e8f0fe; color: #1a56db; }
         .badge-gray    { background: #f1f3f4; color: #5f6368; }
 
-        /* BUTTONS */
+        /* ─── BUTTONS ────────────────────────────────── */
         .btn {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 8px 16px; border-radius: 8px;
@@ -160,7 +192,7 @@
         .btn-sm { padding: 5px 10px; font-size: 12px; }
         .btn-icon { width: 32px; height: 32px; padding: 0; justify-content: center; border-radius: 8px; }
 
-        /* FORMS */
+        /* ─── FORMS ─────────────────────────────────── */
         .form-group { margin-bottom: 16px; }
         .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #374151; }
         .form-control {
@@ -177,7 +209,7 @@
         }
         .form-select { appearance: none; }
 
-        /* ALERTS */
+        /* ─── ALERTS ─────────────────────────────────── */
         .alert {
             padding: 12px 16px; border-radius: 8px;
             font-size: 13.5px; margin-bottom: 16px;
@@ -186,7 +218,7 @@
         .alert-success { background: #e8f5ee; color: #145f38; border: 1px solid #b7dfca; }
         .alert-error   { background: #fce8e6; color: #c5221f; border: 1px solid #f5c6c3; }
 
-        /* PAGINATION */
+        /* ─── PAGINATION ─────────────────────────────── */
         .pagination { display: flex; gap: 4px; align-items: center; }
         .page-link {
             padding: 6px 12px; border-radius: 6px; font-size: 13px;
@@ -198,31 +230,70 @@
             background: var(--primary); color: #fff; border-color: var(--primary);
         }
 
-        /* GRID */
+        /* ─── GRID ───────────────────────────────────── */
         .grid { display: grid; gap: 16px; }
         .grid-4 { grid-template-columns: repeat(4, 1fr); }
         .grid-3 { grid-template-columns: repeat(3, 1fr); }
         .grid-2 { grid-template-columns: repeat(2, 1fr); }
 
+        /* ─── RESPONSIVE ─────────────────────────────── */
         @media (max-width: 1024px) {
             .grid-4 { grid-template-columns: repeat(2, 1fr); }
         }
+
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
+            /* Sidebar tersembunyi, muncul lewat JS */
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: 4px 0 24px rgba(0,0,0,.3);
+            }
             .sidebar.open { transform: translateX(0); }
+
+            /* Tombol close sidebar tampil */
+            .sidebar-close { display: block; }
+
+            /* Main tanpa margin kiri */
             .main-wrap { margin-left: 0; }
+
+            /* Topbar: hamburger tampil */
+            .btn-hamburger { display: flex; }
+
+            /* Topbar padding lebih kecil */
+            .topbar { padding: 0 16px; }
+
+            /* Content padding lebih kecil */
+            .page-content { padding: 16px; }
+
+            /* Grid jadi 1 kolom */
             .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+
+            /* Tanggal disembunyikan agar topbar tidak penuh */
+            .topbar-date { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            .topbar { height: 52px; }
+            .topbar-title { font-size: 14px; }
         }
     </style>
     @stack('styles')
 </head>
 <body>
 
+{{-- OVERLAY (klik untuk tutup sidebar di mobile) --}}
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 {{-- SIDEBAR --}}
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-        <h1>KTH <span>App</span></h1>
-        <p>Kelompok Tani Hutan</p>
+        <div>
+            <h1>KTH <span>App</span></h1>
+            <p>Kelompok Tani Hutan</p>
+        </div>
+        {{-- Tombol close hanya di mobile --}}
+        <button class="sidebar-close" id="sidebarClose" title="Tutup menu">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
 
     <nav class="sidebar-nav">
@@ -255,16 +326,13 @@
         <div class="nav-label">Pengiriman</div>
         <a href="{{ route('surat-jalan.index') }}" class="nav-item {{ request()->routeIs('surat-jalan.*') ? 'active' : '' }}">
             <i class="fas fa-truck"></i> Surat Jalan
+        </a>
         <a href="{{ route('periode.index') }}" class="nav-item {{ request()->routeIs('periode.*') ? 'active' : '' }}">
             <i class="fas fa-calendar"></i> Master Periode
-        </a>
-        
         </a>
         <a href="{{ route('penjualan.index') }}" class="nav-item {{ request()->routeIs('penjualan.*') ? 'active' : '' }}">
             <i class="fas fa-money-bill-wave"></i> Penjualan
         </a>
-
-        
 
         <div class="nav-label">Inventaris</div>
         <a href="{{ route('inventaris.index') }}" class="nav-item {{ request()->routeIs('inventaris.*') ? 'active' : '' }}">
@@ -309,9 +377,15 @@
 {{-- MAIN --}}
 <div class="main-wrap">
     <div class="topbar">
-        <div class="topbar-title">@yield('page_title', 'Dashboard')</div>
+        <div class="topbar-left">
+            {{-- Tombol hamburger (hanya mobile) --}}
+            <button class="btn-hamburger" id="btnHamburger" title="Buka menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="topbar-title">@yield('page_title', 'Dashboard')</div>
+        </div>
         <div class="topbar-right">
-            <span style="font-size:13px; color:#6b7a8d;">
+            <span class="topbar-date" style="font-size:13px; color:#6b7a8d;">
                 {{ now()->isoFormat('dddd, D MMMM Y') }}
             </span>
         </div>
@@ -333,7 +407,42 @@
     </div>
 </div>
 
+<script>
+    const sidebar      = document.getElementById('sidebar');
+    const overlay      = document.getElementById('sidebarOverlay');
+    const btnHamburger = document.getElementById('btnHamburger');
+    const btnClose     = document.getElementById('sidebarClose');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden'; // cegah scroll background
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    btnHamburger.addEventListener('click', openSidebar);
+    btnClose.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+
+    // Tutup sidebar otomatis ketika link diklik (navigasi mobile)
+    sidebar.querySelectorAll('.nav-item').forEach(function(link) {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) closeSidebar();
+        });
+    });
+
+    // Kalau layar diperbesar kembali, reset state
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) closeSidebar();
+    });
+</script>
+
 @stack('scripts')
-</body>
 @yield('scripts')
+</body>
 </html>

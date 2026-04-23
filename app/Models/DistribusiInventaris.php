@@ -24,9 +24,13 @@ class DistribusiInventaris extends Model
         return $this->belongsTo(Kth::class);
     }
 
+    // public function detail()
+    // {
+    //     return $this->hasMany(DistribusiInventarisDetail::class);
+    // }
     public function detail()
     {
-        return $this->hasMany(DistribusiInventarisDetail::class);
+        return $this->hasMany(DistribusiInventarisDetail::class, 'distribusi_id');
     }
     // public function details()
     // {
