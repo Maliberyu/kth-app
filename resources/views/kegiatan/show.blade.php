@@ -29,6 +29,7 @@
     }
     .search-box input:focus { outline:none; border-color:var(--primary); }
     .no-result { display:none; text-align:center; color:#adb5bd; padding:32px; }
+    .hidden-panel { display: none !important; }
 </style>
 @endpush
 
@@ -77,6 +78,81 @@
                     </a>
                 </div>
             </div>
+            {{-- Area Foto --}}
+            <div style="position:relative;">
+                @if($kegiatan->foto)
+                    <img src="{{ asset($kegiatan->foto) }}" alt="Foto {{ $kegiatan->nama_kegiatan }}"
+                         id="fotoDisplay"
+                         style="width:100%; max-height:260px; object-fit:cover; display:block;">
+                    {{-- Overlay tombol aksi --}}
+                    <div style="position:absolute; bottom:10px; right:10px; display:flex; gap:6px;">
+                        <button onclick="document.getElementById('panelGantiFoto').classList.toggle('hidden-panel')"
+                                class="btn btn-outline btn-sm"
+                                style="background:rgba(255,255,255,.92); backdrop-filter:blur(4px);">
+                            <i class="fas fa-camera"></i> Ganti
+                        </button>
+                        <form method="POST" action="{{ route('kegiatan.hapus-foto', $kegiatan) }}"
+                              onsubmit="return confirm('Hapus foto ini?')">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-danger btn-sm"
+                                    style="background:rgba(252,232,230,.95); backdrop-filter:blur(4px);">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    {{-- Tidak ada foto: placeholder klik untuk upload --}}
+                    <div onclick="document.getElementById('panelGantiFoto').classList.remove('hidden-panel'); this.style.display='none';"
+                         style="background:#f8fafc; border-bottom:1px solid #f0f3f6; padding:28px;
+                                text-align:center; cursor:pointer; transition:background .2s;"
+                         onmouseover="this.style.background='#f0f3f6'" onmouseout="this.style.background='#f8fafc'"
+                         id="placeholderFoto">
+                        <i class="fas fa-image" style="font-size:32px; color:#d1d9e0; display:block; margin-bottom:8px;"></i>
+                        <span style="font-size:13px; color:#6b7a8d;">Klik untuk tambah foto kegiatan</span>
+                    </div>
+                @endif
+
+                {{-- Panel upload (toggle) — langsung tampil jika belum ada foto --}}
+                <div id="panelGantiFoto" {{ $kegiatan->foto ? 'class="hidden-panel"' : '' }}
+                     style="background:#f8fafc; border-top:1px solid #e8ecf0; padding:16px;">
+                    @error('foto')
+                    <div class="alert alert-error" style="margin-bottom:10px;">
+                        <i class="fas fa-exclamation-circle"></i> {{ $message }}
+                    </div>
+                    @enderror
+                    <form method="POST" action="{{ route('kegiatan.upload-foto', $kegiatan) }}"
+                          enctype="multipart/form-data" id="formUploadFoto">
+                        @csrf
+                        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                            <div id="dropzoneFoto"
+                                 onclick="document.getElementById('fotoFileInput').click()"
+                                 style="flex:1; min-width:200px; border:2px dashed #d1d9e0; border-radius:10px;
+                                        padding:14px 16px; cursor:pointer; display:flex; align-items:center;
+                                        gap:10px; transition:border-color .2s; background:#fff;">
+                                <i class="fas fa-cloud-upload-alt" style="font-size:20px; color:#adb5bd;"></i>
+                                <span id="fotoLabel" style="font-size:13px; color:#6b7a8d;">
+                                    Klik untuk pilih foto &nbsp;·&nbsp; <span style="font-size:11px;">JPG, PNG, WebP — maks 2MB</span>
+                                </span>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="btnUpload" disabled>
+                                <i class="fas fa-upload"></i> Upload
+                            </button>
+                            @if($kegiatan->foto)
+                            <button type="button" onclick="document.getElementById('panelGantiFoto').classList.add('hidden-panel')"
+                                    class="btn btn-outline">Batal</button>
+                            @endif
+                        </div>
+                        <input type="file" id="fotoFileInput" name="foto" accept="image/*"
+                               style="display:none" onchange="onFotoSelected(this)">
+                        {{-- Preview mini --}}
+                        <div id="previewWrap" style="display:none; margin-top:10px;">
+                            <img id="previewMini" src="" style="max-height:100px; border-radius:8px; border:1px solid #e8ecf0;">
+                            <span id="previewName" style="font-size:12px; color:#6b7a8d; margin-left:8px;"></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div class="card-body" style="font-size:13.5px; display:flex; flex-direction:column; gap:10px;">
                 <div style="display:flex; gap:10px;">
                     <span style="color:#6b7a8d; width:110px; flex-shrink:0;">Lokasi</span>
@@ -257,6 +333,35 @@
         `);
         win.document.close();
         win.onload = () => { win.print(); };
+    }
+
+    // Buka panel upload jika ada error validasi foto
+    @if($errors->has('foto'))
+    document.getElementById('panelGantiFoto')?.classList.remove('hidden-panel');
+    @endif
+
+    function onFotoSelected(input) {
+        const btnUpload  = document.getElementById('btnUpload');
+        const label      = document.getElementById('fotoLabel');
+        const previewWrap= document.getElementById('previewWrap');
+        const previewMini= document.getElementById('previewMini');
+        const previewName= document.getElementById('previewName');
+        const dropzone   = document.getElementById('dropzoneFoto');
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            label.textContent = file.name;
+            previewName.textContent = (file.size / 1024).toFixed(0) + ' KB';
+            dropzone.style.borderColor = 'var(--primary)';
+            btnUpload.disabled = false;
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                previewMini.src = e.target.result;
+                previewWrap.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
     }
 
     function filterTable() {

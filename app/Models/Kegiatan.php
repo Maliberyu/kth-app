@@ -12,7 +12,7 @@ class Kegiatan extends Model
     protected $fillable = [
         'nama_kegiatan', 'deskripsi', 'lokasi',
         'tanggal_mulai', 'tanggal_selesai',
-        'tipe', 'status', 'qr_token', 'created_by',
+        'tipe', 'status', 'qr_token', 'foto', 'created_by',
     ];
 
     protected $casts = [

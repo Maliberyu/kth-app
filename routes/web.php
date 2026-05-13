@@ -98,8 +98,10 @@ Route::middleware(['auth'])->group(function () {
 
         // Kegiatan
         Route::resource('kegiatan', KegiatanController::class);
-        Route::get('kegiatan/{kegiatan}/export-excel', [KegiatanController::class, 'exportExcel'])->name('kegiatan.export-excel');
-        Route::get('kegiatan/{kegiatan}/export-pdf',   [KegiatanController::class, 'exportPdf'])->name('kegiatan.export-pdf');
+        Route::get('kegiatan/{kegiatan}/export-excel',  [KegiatanController::class, 'exportExcel'])->name('kegiatan.export-excel');
+        Route::get('kegiatan/{kegiatan}/export-pdf',    [KegiatanController::class, 'exportPdf'])->name('kegiatan.export-pdf');
+        Route::post('kegiatan/{kegiatan}/upload-foto',  [KegiatanController::class, 'uploadFoto'])->name('kegiatan.upload-foto');
+        Route::delete('kegiatan/{kegiatan}/hapus-foto', [KegiatanController::class, 'hapusFoto'])->name('kegiatan.hapus-foto');
     });
 
         // =====================================================
