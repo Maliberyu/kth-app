@@ -36,4 +36,8 @@ class SuratJalan extends Model
     {
         return $this->hasMany(Penjualan::class);
     }
+    public function details()
+    {
+        return $this->hasMany(\App\Models\SuratJalanDetail::class, 'surat_jalan_id');
+    }
 }

@@ -12,11 +12,18 @@ use App\Http\Controllers\InventarisController;
 use App\Http\Controllers\BpjsController;
  use App\Http\Controllers\PeriodeController;
  use App\Http\Controllers\BlokPetaController;
+use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\KegiatanPublicController;
 
 // =========================================================
 // PUBLIC
 // =========================================================
 Route::get('/', fn() => redirect()->route('dashboard'));
+
+// Registrasi kegiatan publik (scan QR — tanpa auth)
+Route::get('/daftar/{token}',        [KegiatanPublicController::class, 'show'])->name('daftar.show');
+Route::post('/daftar/{token}',       [KegiatanPublicController::class, 'store'])->name('daftar.store');
+Route::get('/daftar/{token}/sukses', [KegiatanPublicController::class, 'sukses'])->name('daftar.sukses');
 
 // =========================================================
 // AUTH (Breeze)
@@ -88,6 +95,11 @@ Route::middleware(['auth'])->group(function () {
         //bpjs
         Route::post('penyadap/{penyadap}/bpjs', [BpjsController::class, 'store'])->name('penyadap.bpjs.store');
         Route::delete('bpjs/{bpjs}', [BpjsController::class, 'destroy'])->name('bpjs.destroy');
+
+        // Kegiatan
+        Route::resource('kegiatan', KegiatanController::class);
+        Route::get('kegiatan/{kegiatan}/export-excel', [KegiatanController::class, 'exportExcel'])->name('kegiatan.export-excel');
+        Route::get('kegiatan/{kegiatan}/export-pdf',   [KegiatanController::class, 'exportPdf'])->name('kegiatan.export-pdf');
     });
 
         // =====================================================

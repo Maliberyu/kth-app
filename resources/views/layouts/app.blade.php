@@ -236,6 +236,34 @@
         .grid-3 { grid-template-columns: repeat(3, 1fr); }
         .grid-2 { grid-template-columns: repeat(2, 1fr); }
 
+        /* ─── SUBMENU ───────────────────────────────── */
+        .nav-sub {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height .25s ease;
+        }
+        .nav-sub.open { max-height: 200px; }
+        .nav-item-parent {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 20px; color: rgba(255,255,255,.65);
+            text-decoration: none; font-size: 13.5px; font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all .2s; cursor: pointer;
+            background: none; border-top: none; border-right: none; border-bottom: none;
+            width: 100%;
+        }
+        .nav-item-parent:hover, .nav-item-parent.active {
+            background: rgba(255,255,255,.06); color: #fff; border-left-color: var(--accent);
+        }
+        .nav-item-parent .left { display: flex; align-items: center; gap: 10px; }
+        .nav-item-parent i.arrow { font-size: 10px; transition: transform .25s; }
+        .nav-item-parent.open i.arrow { transform: rotate(180deg); }
+        .nav-sub .nav-item { padding-left: 46px; font-size: 13px; }
+        .nav-sub .nav-item .soon-badge {
+            font-size: 9px; background: var(--accent); color: #fff;
+            padding: 1px 5px; border-radius: 8px; margin-left: 4px;
+        }
+
         /* ─── RESPONSIVE ─────────────────────────────── */
         @media (max-width: 1024px) {
             .grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -344,6 +372,23 @@
         <a href="{{ route('inventaris.distribusi') }}" class="nav-item">
             <i class="fas fa-arrow-up"></i> Distribusi
         </a>
+
+        <div class="nav-label">Kegiatan</div>
+        @php $kegiatanActive = request()->routeIs('kegiatan.*'); @endphp
+        <button class="nav-item-parent {{ $kegiatanActive ? 'active open' : '' }}" onclick="toggleSubMenu(this)">
+            <span class="left"><i class="fas fa-calendar-alt"></i> Kegiatan</span>
+            <i class="fas fa-chevron-down arrow"></i>
+        </button>
+        <div class="nav-sub {{ $kegiatanActive ? 'open' : '' }}">
+            <a href="{{ route('kegiatan.index', ['tipe'=>'dalam_ruangan']) }}"
+               class="nav-item {{ request()->routeIs('kegiatan.*') && request()->get('tipe','dalam_ruangan') === 'dalam_ruangan' ? 'active' : '' }}">
+                <i class="fas fa-door-open"></i> Dalam Ruangan
+            </a>
+            <a href="#" class="nav-item" style="opacity:.5; pointer-events:none;" title="Coming soon">
+                <i class="fas fa-tree"></i> Luar Ruangan
+                <span class="soon-badge">Soon</span>
+            </a>
+        </div>
         @endrole
 
         @role('penyadap')
@@ -440,6 +485,13 @@
     window.addEventListener('resize', function() {
         if (window.innerWidth > 768) closeSidebar();
     });
+
+    function toggleSubMenu(btn) {
+        const sub = btn.nextElementSibling;
+        const isOpen = sub.classList.contains('open');
+        sub.classList.toggle('open', !isOpen);
+        btn.classList.toggle('open', !isOpen);
+    }
 </script>
 
 @stack('scripts')

@@ -2,7 +2,7 @@
 @extends('layouts.app')
 
 @section('title', 'Catat Produksi')
-@section('page_title', '✏️ Catat Produksi Baru')
+@section('page_title', ' Catat Produksi Baru')
 
 @section('content')
 <div class="card" style="max-width:600px;">
