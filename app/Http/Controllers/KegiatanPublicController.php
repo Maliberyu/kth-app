@@ -11,10 +11,16 @@ class KegiatanPublicController extends Controller
 {
     public function show(string $token)
     {
-        $kegiatan = Kegiatan::where('qr_token', $token)
-            ->where('status', 'aktif')
-            ->firstOrFail();
+        $kegiatan = Kegiatan::where('qr_token', $token)->firstOrFail();
 
+        if ($kegiatan->tipe === 'luar_ruangan') {
+            $fotos   = $kegiatan->fotos;
+            $peserta = $kegiatan->peserta()->orderBy('created_at')->get();
+            return view('kegiatan.luar.public', compact('kegiatan', 'fotos', 'peserta'));
+        }
+
+        // Dalam ruangan: hanya aktif yang bisa registrasi
+        abort_unless($kegiatan->status === 'aktif', 404);
         return view('kegiatan.register', compact('kegiatan'));
     }
 
