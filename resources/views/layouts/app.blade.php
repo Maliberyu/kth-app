@@ -374,19 +374,19 @@
         </a>
 
         <div class="nav-label">Kegiatan</div>
-        @php $kegiatanActive = request()->routeIs('kegiatan.*'); @endphp
+        @php $kegiatanActive = request()->routeIs('kegiatan.*') || request()->routeIs('kegiatan-luar.*'); @endphp
         <button class="nav-item-parent {{ $kegiatanActive ? 'active open' : '' }}" onclick="toggleSubMenu(this)">
             <span class="left"><i class="fas fa-calendar-alt"></i> Kegiatan</span>
             <i class="fas fa-chevron-down arrow"></i>
         </button>
         <div class="nav-sub {{ $kegiatanActive ? 'open' : '' }}">
             <a href="{{ route('kegiatan.index', ['tipe'=>'dalam_ruangan']) }}"
-               class="nav-item {{ request()->routeIs('kegiatan.*') && request()->get('tipe','dalam_ruangan') === 'dalam_ruangan' ? 'active' : '' }}">
+               class="nav-item {{ request()->routeIs('kegiatan.*') ? 'active' : '' }}">
                 <i class="fas fa-door-open"></i> Dalam Ruangan
             </a>
-            <a href="#" class="nav-item" style="opacity:.5; pointer-events:none;" title="Coming soon">
+            <a href="{{ route('kegiatan-luar.index') }}"
+               class="nav-item {{ request()->routeIs('kegiatan-luar.*') ? 'active' : '' }}">
                 <i class="fas fa-tree"></i> Luar Ruangan
-                <span class="soon-badge">Soon</span>
             </a>
         </div>
         @endrole

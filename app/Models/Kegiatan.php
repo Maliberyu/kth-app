@@ -10,9 +10,10 @@ use Illuminate\Support\Str;
 class Kegiatan extends Model
 {
     protected $fillable = [
-        'nama_kegiatan', 'deskripsi', 'lokasi',
+        'nama_kegiatan', 'deskripsi', 'uraian_kegiatan', 'lokasi',
         'tanggal_mulai', 'tanggal_selesai',
-        'tipe', 'status', 'qr_token', 'foto', 'created_by',
+        'tipe', 'status', 'qr_token', 'foto',
+        'latitude', 'longitude', 'created_by',
     ];
 
     protected $casts = [
@@ -32,6 +33,11 @@ class Kegiatan extends Model
     public function peserta(): HasMany
     {
         return $this->hasMany(KegiatanPeserta::class);
+    }
+
+    public function fotos(): HasMany
+    {
+        return $this->hasMany(KegiatanFoto::class)->orderBy('urutan');
     }
 
     public function creator(): BelongsTo

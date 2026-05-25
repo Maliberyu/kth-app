@@ -13,6 +13,7 @@ use App\Http\Controllers\BpjsController;
  use App\Http\Controllers\PeriodeController;
  use App\Http\Controllers\BlokPetaController;
 use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\KegiatanLuarController;
 use App\Http\Controllers\KegiatanPublicController;
 
 // =========================================================
@@ -96,12 +97,20 @@ Route::middleware(['auth'])->group(function () {
         Route::post('penyadap/{penyadap}/bpjs', [BpjsController::class, 'store'])->name('penyadap.bpjs.store');
         Route::delete('bpjs/{bpjs}', [BpjsController::class, 'destroy'])->name('bpjs.destroy');
 
-        // Kegiatan
+        // Kegiatan Dalam Ruangan
         Route::resource('kegiatan', KegiatanController::class);
         Route::get('kegiatan/{kegiatan}/export-excel',  [KegiatanController::class, 'exportExcel'])->name('kegiatan.export-excel');
         Route::get('kegiatan/{kegiatan}/export-pdf',    [KegiatanController::class, 'exportPdf'])->name('kegiatan.export-pdf');
         Route::post('kegiatan/{kegiatan}/upload-foto',  [KegiatanController::class, 'uploadFoto'])->name('kegiatan.upload-foto');
         Route::delete('kegiatan/{kegiatan}/hapus-foto', [KegiatanController::class, 'hapusFoto'])->name('kegiatan.hapus-foto');
+
+        // Kegiatan Luar Ruangan
+        Route::resource('kegiatan-luar', KegiatanLuarController::class);
+        Route::post('kegiatan-luar/{kegiatanLuar}/foto',             [KegiatanLuarController::class, 'uploadFoto'])->name('kegiatan-luar.upload-foto');
+        Route::delete('kegiatan-luar/{kegiatanLuar}/foto/{foto}',    [KegiatanLuarController::class, 'hapusFoto'])->name('kegiatan-luar.hapus-foto');
+        Route::post('kegiatan-luar/{kegiatanLuar}/peserta',          [KegiatanLuarController::class, 'addPeserta'])->name('kegiatan-luar.add-peserta');
+        Route::delete('kegiatan-luar/{kegiatanLuar}/peserta/{peserta}', [KegiatanLuarController::class, 'removePeserta'])->name('kegiatan-luar.remove-peserta');
+        Route::get('kegiatan-luar/{kegiatanLuar}/export-excel',      [KegiatanLuarController::class, 'exportExcel'])->name('kegiatan-luar.export-excel');
     });
 
         // =====================================================
