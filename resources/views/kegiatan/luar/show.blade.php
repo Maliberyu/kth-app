@@ -176,6 +176,39 @@
     </div>
 </div>
 
+{{-- QR Registrasi Peserta --}}
+<div class="card" style="margin-bottom:20px;">
+    <div class="card-header">
+        <h3><i class="fas fa-qrcode" style="color:#1a7f4b;margin-right:8px;"></i>QR Registrasi Peserta</h3>
+        <a href="{{ $kegiatanLuar->registrasi_url }}" target="_blank" class="btn btn-outline btn-sm">
+            <i class="fas fa-external-link-alt"></i> Buka Halaman
+        </a>
+    </div>
+    <div class="card-body">
+        <div style="display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;">
+            <div style="border:1px solid #e8ecf0; border-radius:10px; padding:10px; background:#fff; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <div id="qrcodeLuar"></div>
+            </div>
+            <div style="flex:1; min-width:200px;">
+                <p style="font-size:13.5px; color:#1e2a35; margin:0 0 6px; font-weight:600;">Bagikan QR ini kepada peserta</p>
+                <p style="font-size:12.5px; color:#6b7a8d; margin:0 0 14px; line-height:1.65;">
+                    Peserta dapat memindai QR ini untuk melihat info kegiatan dan mendaftarkan diri secara mandiri tanpa perlu login.
+                </p>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                    <input type="text" id="linkLuar" readonly value="{{ $kegiatanLuar->registrasi_url }}"
+                           style="flex:1; min-width:180px; font-size:12px; padding:7px 10px; border:1px solid #e8ecf0; border-radius:6px; background:#f8fafc; color:#6b7a8d; outline:none; cursor:text;">
+                    <button onclick="copyLinkLuar()" class="btn btn-outline btn-sm" id="btnCopyLuar">
+                        <i class="fas fa-copy"></i> Salin
+                    </button>
+                </div>
+                <p style="font-size:11px; color:#adb5bd; margin:8px 0 0;">
+                    <i class="fas fa-info-circle"></i> Setiap kegiatan memiliki link unik yang tidak dapat diubah.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- Foto Dokumentasi --}}
 <div class="card" style="margin-bottom:20px;">
     <div class="card-header">
@@ -382,6 +415,7 @@
 
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
     // ── Peta ──────────────────────────────────────────
     @if($kegiatanLuar->latitude && $kegiatanLuar->longitude)
@@ -392,6 +426,24 @@
         .bindPopup('<strong>{{ addslashes($kegiatanLuar->nama_kegiatan) }}</strong><br>{{ addslashes($kegiatanLuar->lokasi) }}')
         .openPopup();
     @endif
+
+    // ── QR Code Registrasi ───────────────────────────
+    new QRCode(document.getElementById('qrcodeLuar'), {
+        text: '{{ $kegiatanLuar->registrasi_url }}',
+        width: 148,
+        height: 148,
+        colorDark: '#0f2419',
+        colorLight: '#ffffff',
+    });
+
+    function copyLinkLuar() {
+        const val = document.getElementById('linkLuar').value;
+        navigator.clipboard.writeText(val).then(() => {
+            const btn = document.getElementById('btnCopyLuar');
+            btn.innerHTML = '<i class="fas fa-check"></i> Tersalin';
+            setTimeout(() => btn.innerHTML = '<i class="fas fa-copy"></i> Salin', 2000);
+        });
+    }
 
     // ── Upload Foto ──────────────────────────────────
     @if($errors->has('foto'))
