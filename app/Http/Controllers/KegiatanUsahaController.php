@@ -263,6 +263,51 @@ class KegiatanUsahaController extends Controller
             ->with('active_tab', 'harian');
     }
 
+    // ── QR Transparansi ───────────────────────────────────
+
+    public function generateQr(KegiatanUsaha $kegiatanUsaha)
+    {
+        $this->authorize($kegiatanUsaha);
+        if (!$kegiatanUsaha->qr_token) {
+            $kegiatanUsaha->update(['qr_token' => \Illuminate\Support\Str::random(32), 'qr_aktif' => true]);
+        }
+        return back()->with('success', 'QR berhasil digenerate.');
+    }
+
+    public function toggleQr(KegiatanUsaha $kegiatanUsaha)
+    {
+        $this->authorize($kegiatanUsaha);
+        $kegiatanUsaha->update(['qr_aktif' => !$kegiatanUsaha->qr_aktif]);
+        $status = $kegiatanUsaha->qr_aktif ? 'diaktifkan' : 'dinonaktifkan';
+        return back()->with('success', "QR transparansi berhasil {$status}.");
+    }
+
+    // ── Print / PDF ────────────────────────────────────────
+
+    public function printHarian(KegiatanUsaha $kegiatanUsaha)
+    {
+        $this->authorize($kegiatanUsaha);
+        $kegiatanUsaha->load('harian.fotos');
+        return view('kegiatan.usaha.print-harian', compact('kegiatanUsaha'));
+    }
+
+    public function printTransaksi(KegiatanUsaha $kegiatanUsaha)
+    {
+        $this->authorize($kegiatanUsaha);
+        $kegiatanUsaha->load(['modal', 'transaksi']);
+
+        $totalModal       = $kegiatanUsaha->modal->sum('jumlah');
+        $totalPemasukan   = $kegiatanUsaha->transaksi->where('tipe', 'pemasukan')->sum('jumlah');
+        $totalPengeluaran = $kegiatanUsaha->transaksi->where('tipe', 'pengeluaran')->sum('jumlah');
+        $kasTersedia      = $totalModal + $totalPemasukan - $totalPengeluaran;
+        $labaRugi         = $totalPemasukan - $totalPengeluaran;
+
+        return view('kegiatan.usaha.print-transaksi', compact(
+            'kegiatanUsaha', 'totalModal', 'totalPemasukan',
+            'totalPengeluaran', 'kasTersedia', 'labaRugi'
+        ));
+    }
+
     private function authorize(KegiatanUsaha $usaha): void
     {
         if ($usaha->created_by !== Auth::id() && !auth()->user()->hasRole('super_admin')) {

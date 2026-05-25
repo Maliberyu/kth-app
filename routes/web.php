@@ -16,6 +16,7 @@ use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\KegiatanLuarController;
 use App\Http\Controllers\KegiatanUsahaController;
 use App\Http\Controllers\KegiatanPublicController;
+use App\Http\Controllers\UsahaPublicController;
 
 // =========================================================
 // PUBLIC
@@ -26,6 +27,9 @@ Route::get('/', fn() => redirect()->route('dashboard'));
 Route::get('/daftar/{token}',        [KegiatanPublicController::class, 'show'])->name('daftar.show');
 Route::post('/daftar/{token}',       [KegiatanPublicController::class, 'store'])->name('daftar.store');
 Route::get('/daftar/{token}/sukses', [KegiatanPublicController::class, 'sukses'])->name('daftar.sukses');
+
+// Laporan transparansi kegiatan usaha (publik)
+Route::get('/laporan-usaha/{token}', [UsahaPublicController::class, 'show'])->name('usaha.laporan');
 
 // =========================================================
 // AUTH (Breeze)
@@ -121,6 +125,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('kegiatan-usaha/{kegiatanUsaha}/transaksi/{transaksi}', [KegiatanUsahaController::class, 'removeTransaksi'])->name('kegiatan-usaha.remove-transaksi');
         Route::post('kegiatan-usaha/{kegiatanUsaha}/harian',              [KegiatanUsahaController::class, 'addHarian'])->name('kegiatan-usaha.add-harian');
         Route::delete('kegiatan-usaha/{kegiatanUsaha}/harian/{harian}',   [KegiatanUsahaController::class, 'removeHarian'])->name('kegiatan-usaha.remove-harian');
+        Route::post('kegiatan-usaha/{kegiatanUsaha}/generate-qr',         [KegiatanUsahaController::class, 'generateQr'])->name('kegiatan-usaha.generate-qr');
+        Route::patch('kegiatan-usaha/{kegiatanUsaha}/toggle-qr',          [KegiatanUsahaController::class, 'toggleQr'])->name('kegiatan-usaha.toggle-qr');
+        Route::get('kegiatan-usaha/{kegiatanUsaha}/print-harian',         [KegiatanUsahaController::class, 'printHarian'])->name('kegiatan-usaha.print-harian');
+        Route::get('kegiatan-usaha/{kegiatanUsaha}/print-transaksi',      [KegiatanUsahaController::class, 'printTransaksi'])->name('kegiatan-usaha.print-transaksi');
     });
 
         // =====================================================

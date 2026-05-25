@@ -140,6 +140,65 @@
     </div>
 </div>
 
+{{-- QR Transparansi --}}
+<div class="card" style="margin-bottom:20px;">
+    <div class="card-header">
+        <h3><i class="fas fa-qrcode" style="color:#1a7f4b;margin-right:8px;"></i>QR Transparansi Publik</h3>
+        @if($kegiatanUsaha->qr_token)
+        <form method="POST" action="{{ route('kegiatan-usaha.toggle-qr', $kegiatanUsaha) }}">
+            @csrf @method('PATCH')
+            <button class="btn {{ $kegiatanUsaha->qr_aktif ? 'btn-outline' : 'btn-primary' }} btn-sm">
+                @if($kegiatanUsaha->qr_aktif)
+                <i class="fas fa-toggle-on" style="color:#1a7f4b;"></i> Aktif — Nonaktifkan
+                @else
+                <i class="fas fa-toggle-off"></i> Nonaktif — Aktifkan
+                @endif
+            </button>
+        </form>
+        @endif
+    </div>
+    <div class="card-body">
+        @if($kegiatanUsaha->qr_token)
+        <div style="display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;">
+            <div style="flex-shrink:0;">
+                <div id="qrUsahaCode" style="padding:8px; background:#fff; border:1px solid #e8ecf0; border-radius:8px; display:inline-block;"></div>
+                <div style="margin-top:8px; text-align:center;">
+                    @if($kegiatanUsaha->qr_aktif)
+                    <span class="badge badge-success"><i class="fas fa-circle" style="font-size:7px;margin-right:3px;"></i>Aktif</span>
+                    @else
+                    <span class="badge badge-danger"><i class="fas fa-circle" style="font-size:7px;margin-right:3px;"></i>Nonaktif</span>
+                    @endif
+                </div>
+            </div>
+            <div style="flex:1; min-width:200px;">
+                <p style="font-size:13px; color:#374151; line-height:1.6; margin-bottom:12px;">
+                    Bagikan QR ini kepada pemberi modal atau masyarakat agar dapat memantau kegiatan usaha, keuangan, dan sumber dana secara transparan.
+                </p>
+                <div style="background:#f8fafc; border:1px solid #e8ecf0; border-radius:8px; padding:10px 12px; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                    <code style="font-size:11px; color:#374151; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ $kegiatanUsaha->laporan_url }}</code>
+                    <button onclick="copyLink()" class="btn btn-outline btn-sm" id="copyBtn" title="Salin link">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <a href="{{ $kegiatanUsaha->laporan_url }}" target="_blank" class="btn btn-outline btn-sm">
+                        <i class="fas fa-external-link-alt"></i> Buka Halaman
+                    </a>
+                </div>
+            </div>
+        </div>
+        @else
+        <div style="text-align:center; padding:20px;">
+            <p style="color:#6b7a8d; font-size:13px; margin-bottom:12px;">QR belum digenerate untuk kegiatan usaha ini.</p>
+            <form method="POST" action="{{ route('kegiatan-usaha.generate-qr', $kegiatanUsaha) }}">
+                @csrf
+                <button class="btn btn-primary"><i class="fas fa-qrcode"></i> Generate QR</button>
+            </form>
+        </div>
+        @endif
+    </div>
+</div>
+
 {{-- Tabs card --}}
 <div class="card">
     <div class="card-header" style="padding-bottom:0; border-bottom:none;">
@@ -164,9 +223,14 @@
         <div id="tab-harian" class="tab-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                 <span style="font-size:13px; color:#6b7a8d;">{{ $kegiatanUsaha->harian->count() }} catatan tercatat</span>
-                <button onclick="togglePanel('addHarianPanel')" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> Tambah Catatan
-                </button>
+                <div style="display:flex; gap:8px;">
+                    <a href="{{ route('kegiatan-usaha.print-harian', $kegiatanUsaha) }}" target="_blank" class="btn btn-outline btn-sm">
+                        <i class="fas fa-print"></i> Cetak PDF
+                    </a>
+                    <button onclick="togglePanel('addHarianPanel')" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Tambah Catatan
+                    </button>
+                </div>
             </div>
 
             {{-- Form tambah harian --}}
@@ -262,9 +326,14 @@
         <div id="tab-transaksi" class="tab-content" style="display:none;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                 <span style="font-size:13px; color:#6b7a8d;">{{ $kegiatanUsaha->transaksi->count() }} transaksi tercatat</span>
-                <button onclick="togglePanel('addTransaksiPanel')" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> Tambah Transaksi
-                </button>
+                <div style="display:flex; gap:8px;">
+                    <a href="{{ route('kegiatan-usaha.print-transaksi', $kegiatanUsaha) }}" target="_blank" class="btn btn-outline btn-sm">
+                        <i class="fas fa-print"></i> Cetak PDF
+                    </a>
+                    <button onclick="togglePanel('addTransaksiPanel')" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Tambah Transaksi
+                    </button>
+                </div>
             </div>
 
             {{-- Form tambah transaksi --}}
@@ -475,6 +544,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
     // ── Lightbox ────────────────────────────────────────────
     const lbData = {};
@@ -567,6 +637,24 @@
             opt.textContent = label;
             sel.appendChild(opt);
         }
+    }
+
+    // ── QR Code ───────────────────────────────────────────
+    @if($kegiatanUsaha->qr_token)
+    new QRCode(document.getElementById('qrUsahaCode'), {
+        text: '{{ $kegiatanUsaha->laporan_url }}',
+        width: 156, height: 156,
+        colorDark: '#0f2419', colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M,
+    });
+    @endif
+
+    function copyLink() {
+        navigator.clipboard.writeText('{{ $kegiatanUsaha->laporan_url }}').then(() => {
+            const btn = document.getElementById('copyBtn');
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i>'; }, 2000);
+        });
     }
 </script>
 @endpush

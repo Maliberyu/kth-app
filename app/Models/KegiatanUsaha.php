@@ -13,12 +13,27 @@ class KegiatanUsaha extends Model
     protected $fillable = [
         'nama_usaha', 'jenis_usaha', 'deskripsi',
         'tanggal_mulai', 'tanggal_selesai', 'status', 'created_by',
+        'qr_token', 'qr_aktif',
     ];
 
     protected $casts = [
         'tanggal_mulai'   => 'date',
         'tanggal_selesai' => 'date',
+        'qr_aktif'        => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            $model->qr_token = \Illuminate\Support\Str::random(32);
+            $model->qr_aktif = true;
+        });
+    }
+
+    public function getLaporanUrlAttribute(): string
+    {
+        return url('/laporan-usaha/' . $this->qr_token);
+    }
 
     public function modal(): HasMany
     {

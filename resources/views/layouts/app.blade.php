@@ -315,7 +315,7 @@
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
         <div>
-            <h1>KTH <span>App</span></h1>
+            <h1>KTH <span>Manajemen System</span></h1>
             <p>Kelompok Tani Hutan</p>
         </div>
         {{-- Tombol close hanya di mobile --}}
