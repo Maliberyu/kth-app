@@ -14,6 +14,7 @@ use App\Http\Controllers\BpjsController;
  use App\Http\Controllers\BlokPetaController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\KegiatanLuarController;
+use App\Http\Controllers\KegiatanUsahaController;
 use App\Http\Controllers\KegiatanPublicController;
 
 // =========================================================
@@ -111,6 +112,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('kegiatan-luar/{kegiatanLuar}/peserta',          [KegiatanLuarController::class, 'addPeserta'])->name('kegiatan-luar.add-peserta');
         Route::delete('kegiatan-luar/{kegiatanLuar}/peserta/{peserta}', [KegiatanLuarController::class, 'removePeserta'])->name('kegiatan-luar.remove-peserta');
         Route::get('kegiatan-luar/{kegiatanLuar}/export-excel',      [KegiatanLuarController::class, 'exportExcel'])->name('kegiatan-luar.export-excel');
+
+        // Kegiatan Usaha
+        Route::resource('kegiatan-usaha', KegiatanUsahaController::class);
+        Route::post('kegiatan-usaha/{kegiatanUsaha}/modal',               [KegiatanUsahaController::class, 'addModal'])->name('kegiatan-usaha.add-modal');
+        Route::delete('kegiatan-usaha/{kegiatanUsaha}/modal/{modal}',     [KegiatanUsahaController::class, 'removeModal'])->name('kegiatan-usaha.remove-modal');
+        Route::post('kegiatan-usaha/{kegiatanUsaha}/transaksi',           [KegiatanUsahaController::class, 'addTransaksi'])->name('kegiatan-usaha.add-transaksi');
+        Route::delete('kegiatan-usaha/{kegiatanUsaha}/transaksi/{transaksi}', [KegiatanUsahaController::class, 'removeTransaksi'])->name('kegiatan-usaha.remove-transaksi');
+        Route::post('kegiatan-usaha/{kegiatanUsaha}/harian',              [KegiatanUsahaController::class, 'addHarian'])->name('kegiatan-usaha.add-harian');
+        Route::delete('kegiatan-usaha/{kegiatanUsaha}/harian/{harian}',   [KegiatanUsahaController::class, 'removeHarian'])->name('kegiatan-usaha.remove-harian');
     });
 
         // =====================================================

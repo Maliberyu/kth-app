@@ -242,7 +242,7 @@
             max-height: 0;
             transition: max-height .25s ease;
         }
-        .nav-sub.open { max-height: 200px; }
+        .nav-sub.open { max-height: 300px; }
         .nav-item-parent {
             display: flex; align-items: center; justify-content: space-between;
             padding: 10px 20px; color: rgba(255,255,255,.65);
@@ -374,7 +374,7 @@
         </a>
 
         <div class="nav-label">Kegiatan</div>
-        @php $kegiatanActive = request()->routeIs('kegiatan.*') || request()->routeIs('kegiatan-luar.*'); @endphp
+        @php $kegiatanActive = request()->routeIs('kegiatan.*') || request()->routeIs('kegiatan-luar.*') || request()->routeIs('kegiatan-usaha.*'); @endphp
         <button class="nav-item-parent {{ $kegiatanActive ? 'active open' : '' }}" onclick="toggleSubMenu(this)">
             <span class="left"><i class="fas fa-calendar-alt"></i> Kegiatan</span>
             <i class="fas fa-chevron-down arrow"></i>
@@ -387,6 +387,10 @@
             <a href="{{ route('kegiatan-luar.index') }}"
                class="nav-item {{ request()->routeIs('kegiatan-luar.*') ? 'active' : '' }}">
                 <i class="fas fa-tree"></i> Luar Ruangan
+            </a>
+            <a href="{{ route('kegiatan-usaha.index') }}"
+               class="nav-item {{ request()->routeIs('kegiatan-usaha.*') ? 'active' : '' }}">
+                <i class="fas fa-briefcase"></i> Kegiatan Usaha
             </a>
         </div>
         @endrole
