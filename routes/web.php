@@ -17,6 +17,8 @@ use App\Http\Controllers\KegiatanLuarController;
 use App\Http\Controllers\KegiatanUsahaController;
 use App\Http\Controllers\KegiatanPublicController;
 use App\Http\Controllers\UsahaPublicController;
+use App\Http\Controllers\KupsController;
+use App\Http\Controllers\KomoditasController;
 
 // =========================================================
 // PUBLIC
@@ -127,6 +129,13 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('kegiatan-usaha/{kegiatanUsaha}/harian/{harian}',   [KegiatanUsahaController::class, 'removeHarian'])->name('kegiatan-usaha.remove-harian');
         Route::post('kegiatan-usaha/{kegiatanUsaha}/generate-qr',         [KegiatanUsahaController::class, 'generateQr'])->name('kegiatan-usaha.generate-qr');
         Route::patch('kegiatan-usaha/{kegiatanUsaha}/toggle-qr',          [KegiatanUsahaController::class, 'toggleQr'])->name('kegiatan-usaha.toggle-qr');
+        // KUPS & Komoditas
+        Route::resource('kups', KupsController::class);
+        Route::get('kups/{kup}/print', [KupsController::class, 'printPdf'])->name('kups.print');
+        Route::post('kups/{kup}/komoditas', [KomoditasController::class, 'store'])->name('kups.komoditas.store');
+        Route::put('kups/{kup}/komoditas/{komoditas}', [KomoditasController::class, 'update'])->name('kups.komoditas.update');
+        Route::delete('kups/{kup}/komoditas/{komoditas}', [KomoditasController::class, 'destroy'])->name('kups.komoditas.destroy');
+
         Route::get('kegiatan-usaha/{kegiatanUsaha}/print-harian',         [KegiatanUsahaController::class, 'printHarian'])->name('kegiatan-usaha.print-harian');
         Route::get('kegiatan-usaha/{kegiatanUsaha}/print-transaksi',      [KegiatanUsahaController::class, 'printTransaksi'])->name('kegiatan-usaha.print-transaksi');
     });

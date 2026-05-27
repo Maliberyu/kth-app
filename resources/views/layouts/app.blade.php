@@ -345,6 +345,9 @@
         <a href="{{ route('blok.index') }}" class="nav-item {{ request()->routeIs('blok.*') ? 'active' : '' }}">
             <i class="fas fa-map"></i> Blok
         </a>
+        <a href="{{ route('kups.index') }}" class="nav-item {{ request()->routeIs('kups.*') ? 'active' : '' }}">
+            <i class="fas fa-layer-group"></i> KUPS & Komoditas
+        </a>
 
         <div class="nav-label">Produksi</div>
         <a href="{{ route('produksi.index') }}" class="nav-item {{ request()->routeIs('produksi.*') ? 'active' : '' }}">
