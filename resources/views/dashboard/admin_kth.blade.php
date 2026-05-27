@@ -396,9 +396,91 @@
                 <a href="{{ route('kegiatan.create') }}" class="btn btn-outline btn-sm"><i class="fas fa-calendar-plus"></i> Buat Kegiatan</a>
                 <a href="{{ route('kegiatan-usaha.create') }}" class="btn btn-outline btn-sm"><i class="fas fa-briefcase"></i> Buat Usaha</a>
                 <a href="{{ route('kups.create') }}" class="btn btn-outline btn-sm"><i class="fas fa-layer-group"></i> Tambah KUPS</a>
+                <a href="{{ route('sumber-air.create') }}" class="btn btn-outline btn-sm" style="grid-column:1/-1;"><i class="fas fa-tint"></i> Tambah Sumber Air</a>
             </div>
         </div>
 
+    </div>
+</div>
+
+{{-- ═══════════════════════════════════
+     SUMBER AIR
+════════════════════════════════════ --}}
+<div class="sec-head" style="margin-top:28px;">
+    <span class="sec-label"><i class="fas fa-tint" style="color:#1a56db;"></i> Sumber Air</span>
+    <div class="sec-line"></div>
+    <a href="{{ route('sumber-air.index') }}" class="btn btn-outline btn-sm">
+        <i class="fas fa-arrow-right"></i> Detail
+    </a>
+</div>
+<div class="grid-3" style="margin-bottom:16px;">
+    <a href="{{ route('sumber-air.index') }}" class="stat-card">
+        <div class="stat-icon icon-blue"><i class="fas fa-tint"></i></div>
+        <p class="stat-value">{{ $total_sumber_air }}</p>
+        <p class="stat-label">Total Sumber Air</p>
+    </a>
+    <a href="{{ route('sumber-air.index') }}" class="stat-card">
+        <div class="stat-icon icon-blue"><i class="fas fa-glass-water"></i></div>
+        <p class="stat-value">{{ $sumber_air_bersih }}</p>
+        <p class="stat-label">Air Bersih</p>
+    </a>
+    <a href="{{ route('sumber-air.index') }}" class="stat-card">
+        <div class="stat-icon icon-amber"><i class="fas fa-water"></i></div>
+        <p class="stat-value">{{ $sumber_air_baku }}</p>
+        <p class="stat-label">Air Baku</p>
+    </a>
+</div>
+
+<div class="grid-2">
+    {{-- Chart debit --}}
+    <div class="chart-card">
+        <p class="chart-title"><i class="fas fa-chart-line" style="color:#1a56db;margin-right:6px;"></i>Tren Debit Sumber Air (6 Bulan)</p>
+        @if($total_sumber_air > 0)
+        <canvas id="chartDebit"></canvas>
+        @else
+        <div style="text-align:center;padding:40px;color:#adb5bd;font-size:13px;">Belum ada data sumber air.</div>
+        @endif
+    </div>
+
+    {{-- List sumber air --}}
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-list" style="color:#6b7a8d;margin-right:8px;"></i>Daftar Sumber Air</h3>
+            <a href="{{ route('sumber-air.index') }}" class="btn btn-outline btn-sm">Lihat Semua</a>
+        </div>
+        <div class="card-body" style="padding:8px 16px;">
+            @forelse($sumber_air_list as $sa)
+            @php
+                $debitTerakhir = $sa->pengukuran->first();
+                $trend = $sa->trend;
+                $trendColor = $trend === 'naik' ? '#1a7f4b' : ($trend === 'turun' ? '#d93025' : '#6b7a8d');
+                $trendIcon  = $trend === 'naik' ? '↑' : ($trend === 'turun' ? '↓' : '→');
+            @endphp
+            <a href="{{ route('sumber-air.show', $sa) }}"
+               style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f5f7f9;">
+                <div>
+                    <div style="font-weight:600;color:#1e2a35;font-size:13px;">{{ $sa->nama }}</div>
+                    <div style="font-size:11px;color:#6b7a8d;">
+                        <span style="background:{{ $sa->tipe==='air_bersih'?'#dbeafe':'#fef9c3' }};color:{{ $sa->tipe==='air_bersih'?'#1e40af':'#854d0e' }};padding:1px 6px;border-radius:4px;font-weight:600;">
+                            {{ $sa->tipe_label }}
+                        </span>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    @if($debitTerakhir)
+                    <div style="font-size:13px;font-weight:700;color:{{ $trendColor }};">
+                        {{ $debitTerakhir->debit_format }} {{ $trendIcon }}
+                    </div>
+                    <div style="font-size:11px;color:#adb5bd;">{{ $debitTerakhir->tanggal->format('d/m/Y') }}</div>
+                    @else
+                    <div style="font-size:12px;color:#adb5bd;font-style:italic;">Belum diukur</div>
+                    @endif
+                </div>
+            </a>
+            @empty
+            <div style="text-align:center;padding:24px;color:#adb5bd;font-size:13px;">Belum ada sumber air.</div>
+            @endforelse
+        </div>
     </div>
 </div>
 
@@ -474,6 +556,34 @@ new Chart(document.getElementById('chartUsaha'), {
             y:{ beginAtZero:true, grid:{color:'#f0f3f6'}, ticks:{ color:'#6b7a8d',
                 callback: v => v >= 1000000 ? 'Rp'+(v/1000000).toFixed(1)+'jt' : 'Rp'+(v/1000).toFixed(0)+'rb' } },
             x:{ grid:{display:false}, ticks:{color:'#6b7a8d'} }
+        }
+    }
+});
+@endif
+
+// Tren Debit Sumber Air
+@if($total_sumber_air > 0 && count($chart_debit['datasets']) > 0)
+const debitColors = ['#1a7f4b','#1a56db','#f0a500'];
+new Chart(document.getElementById('chartDebit'), {
+    type: 'line',
+    data: {
+        labels: @json($chart_debit['labels']),
+        datasets: @json($chart_debit['datasets']).map((ds, i) => ({
+            ...ds,
+            borderColor: debitColors[i] || '#999',
+            backgroundColor: 'transparent',
+            borderWidth: 2.5,
+            pointRadius: 4,
+            tension: 0.3,
+            spanGaps: true,
+        }))
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'top', labels: { boxWidth: 10, color: '#4a5568' } } },
+        scales: {
+            y: { beginAtZero: true, title: { display: true, text: 'Debit' }, grid: { color: '#f0f3f6' } },
+            x: { grid: { display: false } }
         }
     }
 });

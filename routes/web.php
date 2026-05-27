@@ -19,6 +19,7 @@ use App\Http\Controllers\KegiatanPublicController;
 use App\Http\Controllers\UsahaPublicController;
 use App\Http\Controllers\KupsController;
 use App\Http\Controllers\KomoditasController;
+use App\Http\Controllers\SumberAirController;
 
 // =========================================================
 // PUBLIC
@@ -138,6 +139,17 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('kegiatan-usaha/{kegiatanUsaha}/print-harian',         [KegiatanUsahaController::class, 'printHarian'])->name('kegiatan-usaha.print-harian');
         Route::get('kegiatan-usaha/{kegiatanUsaha}/print-transaksi',      [KegiatanUsahaController::class, 'printTransaksi'])->name('kegiatan-usaha.print-transaksi');
+
+        // Sumber Air
+        Route::resource('sumber-air', SumberAirController::class);
+        Route::post('sumber-air/{sumberAir}/bak',                                        [SumberAirController::class, 'storeBak'])->name('sumber-air.bak.store');
+        Route::delete('sumber-air/{sumberAir}/bak/{bak}',                               [SumberAirController::class, 'destroyBak'])->name('sumber-air.bak.destroy');
+        Route::post('sumber-air/{sumberAir}/bak/{bak}/kampung',                         [SumberAirController::class, 'storeKampung'])->name('sumber-air.kampung.store');
+        Route::delete('sumber-air/{sumberAir}/bak/{bak}/kampung/{kampung}',             [SumberAirController::class, 'destroyKampung'])->name('sumber-air.kampung.destroy');
+        Route::post('sumber-air/{sumberAir}/lahan',                                      [SumberAirController::class, 'storeLahan'])->name('sumber-air.lahan.store');
+        Route::delete('sumber-air/{sumberAir}/lahan/{lahan}',                           [SumberAirController::class, 'destroyLahan'])->name('sumber-air.lahan.destroy');
+        Route::post('sumber-air/{sumberAir}/pengukuran',                                 [SumberAirController::class, 'storePengukuran'])->name('sumber-air.pengukuran.store');
+        Route::delete('sumber-air/{sumberAir}/pengukuran/{pengukuran}',                 [SumberAirController::class, 'destroyPengukuran'])->name('sumber-air.pengukuran.destroy');
     });
 
         // =====================================================

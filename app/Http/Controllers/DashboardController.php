@@ -17,6 +17,8 @@ use App\Models\Kups;
 use App\Models\Komoditas;
 use App\Models\Inventaris;
 use App\Models\InventarisMasuk;
+use App\Models\SumberAir;
+use App\Models\PengukuranDebit;
 
 class DashboardController extends Controller
 {
@@ -158,6 +160,33 @@ class DashboardController extends Controller
             $chart_kups['data'][]   = $k->komoditas_count;
         }
 
+        // ── Sumber Air ────────────────────────────────────
+        $sumber_air_list   = SumberAir::where('created_by', $userId)
+                                ->with(['pengukuran' => fn($q) => $q->latest('tanggal')->take(2)])
+                                ->get();
+        $total_sumber_air  = $sumber_air_list->count();
+        $sumber_air_bersih = $sumber_air_list->where('tipe','air_bersih')->count();
+        $sumber_air_baku   = $sumber_air_list->where('tipe','air_baku')->count();
+
+        // Chart 5: Debit rata-rata per sumber 6 bulan
+        $chart_debit = ['labels' => [], 'datasets' => []];
+        for ($i = 5; $i >= 0; $i--) {
+            $chart_debit['labels'][] = now()->subMonths($i)->isoFormat('MMM');
+        }
+        $colors = ['#1a7f4b','#1a56db','#f0a500'];
+        foreach ($sumber_air_list->take(3) as $idx => $sa) {
+            $dataset = ['label' => $sa->nama, 'borderColor' => $colors[$idx] ?? '#999', 'data' => []];
+            for ($i = 5; $i >= 0; $i--) {
+                $date = now()->subMonths($i);
+                $avg  = PengukuranDebit::where('sumber_air_id', $sa->id)
+                            ->whereYear('tanggal', $date->year)
+                            ->whereMonth('tanggal', $date->month)
+                            ->avg('debit');
+                $dataset['data'][] = $avg ? round((float)$avg, 3) : null;
+            }
+            $chart_debit['datasets'][] = $dataset;
+        }
+
         return view('dashboard.admin_kth', compact(
             'total_penyadap','total_produksi','produksi_pending','stok_getah',
             'surat_jalan',
@@ -165,7 +194,8 @@ class DashboardController extends Controller
             'usaha_aktif','usaha_list','total_modal_all','total_pemasukan_all','total_pengeluaran_all',
             'total_kups','total_komoditas','kups_list',
             'total_inventaris','inventaris_terbaru',
-            'chart_produksi','chart_kegiatan','chart_usaha','chart_kups'
+            'total_sumber_air','sumber_air_bersih','sumber_air_baku','sumber_air_list',
+            'chart_produksi','chart_kegiatan','chart_usaha','chart_kups','chart_debit'
         ));
     }
 
