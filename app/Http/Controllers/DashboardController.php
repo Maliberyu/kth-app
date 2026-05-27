@@ -108,7 +108,7 @@ class DashboardController extends Controller
 
         // ── Inventaris ─────────────────────────────────────
         $total_inventaris = Inventaris::where('kth_id', $kthId)->count();
-        $inventaris_terbaru = InventarisMasuk::whereHas('penyimpanan', fn($q) => $q->where('kth_id',$kthId))
+        $inventaris_terbaru = InventarisMasuk::where('kth_id', $kthId)
                                 ->latest()->take(4)->get();
 
         // ── Chart 1: Produksi Getah 6 bulan ───────────────
