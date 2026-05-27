@@ -72,7 +72,7 @@
             Daftar Komoditas
             <span style="font-weight:400; color:#6b7a8d; font-size:12px;">({{ $komoditas->count() }})</span>
         </h3>
-        <button onclick="document.getElementById('formTambah').classList.toggle('show')"
+        <button onclick="const el=document.getElementById('formTambah'); el.style.display = el.style.display==='none' ? 'block' : 'none';"
                 class="btn btn-primary btn-sm">
             <i class="fas fa-plus"></i> Tambah
         </button>
@@ -117,7 +117,7 @@
             </div>
             <div style="display:flex; gap:8px;">
                 <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tambahkan</button>
-                <button type="button" onclick="document.getElementById('formTambah').classList.remove('show')"
+                <button type="button" onclick="document.getElementById('formTambah').style.display='none'"
                         class="btn btn-outline btn-sm">Batal</button>
             </div>
         </form>
@@ -236,7 +236,7 @@
     }
 
     @if($errors->any())
-    document.getElementById('formTambah').classList.add('show');
+    document.getElementById('formTambah').style.display = 'block';
     @endif
 </script>
 @endpush
