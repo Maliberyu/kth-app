@@ -517,12 +517,12 @@
 @stack('scripts')
 @yield('scripts')
 
-{{-- PWA Install Banner --}}
+{{-- PWA Install Banner (Android/Desktop) --}}
 <div id="pwaInstallBanner" style="
     display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
     background:#0f2419; color:#fff; padding:12px 20px; border-radius:12px;
     box-shadow:0 4px 20px rgba(0,0,0,.35); z-index:9999;
-    display:none; align-items:center; gap:12px; font-size:13px;
+    align-items:center; gap:12px; font-size:13px;
     max-width:calc(100vw - 40px); width:max-content;">
     <img src="{{ asset('icon/iconkth.png') }}" style="width:36px;height:36px;border-radius:8px;" alt="KTH">
     <div>
@@ -539,6 +539,32 @@
         font-size:18px; cursor:pointer; padding:0 4px; line-height:1;">
         ×
     </button>
+</div>
+
+{{-- PWA Install Banner (iOS Safari) --}}
+<div id="pwaIosBanner" style="
+    display:none; position:fixed; bottom:0; left:0; right:0;
+    background:#0f2419; color:#fff; padding:16px 20px 28px;
+    box-shadow:0 -4px 20px rgba(0,0,0,.35); z-index:9999;
+    font-size:13px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img src="{{ asset('icon/iconkth.png') }}" style="width:40px;height:40px;border-radius:10px;" alt="KTH">
+            <div>
+                <div style="font-weight:700;">Install Aplikasi KTH</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.6);">Ikuti langkah di bawah</div>
+            </div>
+        </div>
+        <button id="pwaIosDismiss" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:22px;cursor:pointer;line-height:1;padding:4px;">×</button>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.08); padding:10px 12px; border-radius:8px; line-height:1.6;">
+        <span style="font-size:20px;">1.</span>
+        <span>Tap ikon <strong style="font-size:16px;">⎙</strong> <em>Share</em> di bagian bawah Safari</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.08); padding:10px 12px; border-radius:8px; margin-top:8px; line-height:1.6;">
+        <span style="font-size:20px;">2.</span>
+        <span>Pilih <strong>"Add to Home Screen"</strong> / <strong>"Tambahkan ke Layar Utama"</strong></span>
+    </div>
 </div>
 
 <script>
@@ -578,6 +604,21 @@ dismissBtn && dismissBtn.addEventListener('click', () => {
 window.addEventListener('appinstalled', () => {
     banner.style.display = 'none';
     deferredPrompt = null;
+});
+
+// iOS Safari — tampilkan instruksi manual
+const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isInStandaloneMode = window.navigator.standalone === true;
+const iosBanner = document.getElementById('pwaIosBanner');
+const iosDismiss = document.getElementById('pwaIosDismiss');
+
+if (isIos && !isInStandaloneMode && !sessionStorage.getItem('pwaIosDismissed')) {
+    setTimeout(() => { iosBanner.style.display = 'block'; }, 2000);
+}
+
+iosDismiss && iosDismiss.addEventListener('click', () => {
+    iosBanner.style.display = 'none';
+    sessionStorage.setItem('pwaIosDismissed', '1');
 });
 </script>
 </body>
