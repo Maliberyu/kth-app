@@ -1,0 +1,25 @@
+{
+    "name": "KTH Management",
+    "short_name": "KTH",
+    "description": "Sistem Manajemen Kelompok Tani Hutan",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#0f2419",
+    "theme_color": "#1a7f4b",
+    "icons": [
+        {
+            "src": "icon/iconkth.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icon/iconkth.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

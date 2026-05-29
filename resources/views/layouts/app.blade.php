@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'KTH Management')</title>
+
+    {{-- PWA --}}
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#1a7f4b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="KTH">
+    <link rel="apple-touch-icon" href="{{ asset('icon/iconkth.png') }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -506,5 +516,69 @@
 
 @stack('scripts')
 @yield('scripts')
+
+{{-- PWA Install Banner --}}
+<div id="pwaInstallBanner" style="
+    display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:#0f2419; color:#fff; padding:12px 20px; border-radius:12px;
+    box-shadow:0 4px 20px rgba(0,0,0,.35); z-index:9999;
+    display:none; align-items:center; gap:12px; font-size:13px;
+    max-width:calc(100vw - 40px); width:max-content;">
+    <img src="{{ asset('icon/iconkth.png') }}" style="width:36px;height:36px;border-radius:8px;" alt="KTH">
+    <div>
+        <div style="font-weight:700;">Install Aplikasi KTH</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);">Tambahkan ke layar utama HP Anda</div>
+    </div>
+    <button id="pwaInstallBtn" style="
+        background:#1a7f4b; color:#fff; border:none; padding:8px 14px;
+        border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;">
+        Install
+    </button>
+    <button id="pwaDismissBtn" style="
+        background:none; border:none; color:rgba(255,255,255,.5);
+        font-size:18px; cursor:pointer; padding:0 4px; line-height:1;">
+        ×
+    </button>
+</div>
+
+<script>
+// Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('{{ asset('sw.js') }}', {
+            scope: '{{ asset('/') }}'
+        }).catch(() => {});
+    });
+}
+
+// Install prompt
+let deferredPrompt;
+const banner = document.getElementById('pwaInstallBanner');
+const installBtn = document.getElementById('pwaInstallBtn');
+const dismissBtn = document.getElementById('pwaDismissBtn');
+
+window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    banner.style.display = 'flex';
+});
+
+installBtn && installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    banner.style.display = 'none';
+});
+
+dismissBtn && dismissBtn.addEventListener('click', () => {
+    banner.style.display = 'none';
+});
+
+window.addEventListener('appinstalled', () => {
+    banner.style.display = 'none';
+    deferredPrompt = null;
+});
+</script>
 </body>
 </html>
